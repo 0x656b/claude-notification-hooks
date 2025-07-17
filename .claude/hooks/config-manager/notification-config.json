@@ -16,13 +16,34 @@
         "whitelist": [],
         "blacklist": [],
         "custom": {
-          "Bash": {"PreToolUse": true, "PostToolUse": false},
-          "Edit": {"PreToolUse": true, "PostToolUse": false},
-          "Read": {"PreToolUse": true, "PostToolUse": false},
-          "Write": {"PreToolUse": true, "PostToolUse": false},
-          "Grep": {"PreToolUse": false, "PostToolUse": false},
-          "LS": {"PreToolUse": false, "PostToolUse": false},
-          "Glob": {"PreToolUse": false, "PostToolUse": false}
+          "Bash": {
+            "PreToolUse": true,
+            "PostToolUse": false
+          },
+          "Edit": {
+            "PreToolUse": true,
+            "PostToolUse": false
+          },
+          "Read": {
+            "PreToolUse": true,
+            "PostToolUse": false
+          },
+          "Write": {
+            "PreToolUse": true,
+            "PostToolUse": false
+          },
+          "Grep": {
+            "PreToolUse": false,
+            "PostToolUse": false
+          },
+          "LS": {
+            "PreToolUse": false,
+            "PostToolUse": false
+          },
+          "Glob": {
+            "PreToolUse": false,
+            "PostToolUse": false
+          }
         }
       },
       "_comment": "Sesli bildirimler - MP3 ve beep sesleri"
@@ -53,11 +74,16 @@
     }
   },
   "quiet_hours": {
-    "enabled": false,
+    "enabled": true,
     "start": "23:00",
     "end": "07:00",
-    "mute": ["sound"],
-    "allow": ["telegram", "desktop_toast"],
+    "mute": [
+      "sound"
+    ],
+    "allow": [
+      "telegram",
+      "desktop_toast"
+    ],
     "_comment": "mute: sessiz saatlerde kapatılacak plugin'ler, allow: her zaman çalışacak plugin'ler"
   },
   "logging": {

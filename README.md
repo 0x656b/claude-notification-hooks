@@ -68,6 +68,10 @@ claude-notification-hooks/
 │       │   ├── notify-all.py  # Main notification dispatcher
 │       │   ├── notification-config.json  # User settings
 │       │   └── activity-logger.py
+│       ├── settings-manager/  # Configuration tools
+│       │   ├── configure.py   # Main configuration script
+│       │   ├── configure-notifications.bat
+│       │   └── configure-notifications.sh
 │       ├── voice-notifier/    # Audio notification system
 │       │   ├── smart-notification.py
 │       │   ├── sound-mapping.json
@@ -78,11 +82,15 @@ claude-notification-hooks/
 │       │       └── ...
 │       ├── telegram-bot/      # Telegram integration
 │       │   ├── telegram-notifier.py
-│       │   └── telegram-config.json  # Bot credentials
+│       │   ├── telegram-config.json  # Bot credentials (gitignored)
+│       │   └── telegram-config.json.template
 │       ├── toast-notifier/    # Cross-platform desktop notifications
 │       │   └── cross-platform-notifier.py
 │       └── utils/             # Utility functions
 │           └── platform_utils.py
+├── configure-notifications.bat # Windows configuration wrapper
+├── configure-notifications.sh  # Linux/Mac configuration wrapper
+├── debug-hooks.bat            # Debug tool for troubleshooting
 ├── README.md                  # This file
 ├── README-TR.md              # Turkish documentation
 ├── CLAUDE.md                 # Instructions for Claude
@@ -179,6 +187,19 @@ The installation scripts will:
 - Make Python scripts executable (Linux/macOS)
 
 ### Step 3: Configure (Optional)
+
+**Quick Configuration (New!):**
+Change settings with a single command from the terminal:
+
+```bash
+# Windows
+configure-notifications.bat sound:0 telegram:1
+
+# Linux/Mac
+./configure-notifications.sh lang:en quiet:23:00-07:00
+```
+
+**Manual Configuration:**
 Edit `.claude/hooks/config-manager/notification-config.json`:
 ```json
 {
@@ -245,6 +266,39 @@ This opens the hooks interface. The hooks are already defined in `settings.json`
 - See [Plugin System](#plugin-system) for details
 
 ## ⚙️ Configuration
+
+### Command Line Configuration (New!)
+
+Instead of manually editing JSON files, you can now configure notifications from the command line:
+
+```bash
+# Windows
+configure-notifications.bat [options]
+
+# Linux/Mac
+./configure-notifications.sh [options]
+```
+
+**Options:**
+- `sound:0/1` - Disable/Enable sound notifications
+- `telegram:0/1` - Disable/Enable Telegram notifications
+- `toast:0/1` - Disable/Enable desktop toast notifications
+- `lang:en/tr` - Set language (English/Turkish)
+- `quiet:0/1` - Disable/Enable quiet hours
+- `quiet:HH:MM-HH:MM` - Set quiet hours time range
+- `status` - Show current configuration
+
+**Examples:**
+```bash
+# Disable sound, enable Telegram
+configure-notifications.bat sound:0 telegram:1
+
+# Set Turkish language and quiet hours
+configure-notifications.bat lang:tr quiet:23:00-07:00
+
+# Show current settings
+configure-notifications.bat status
+```
 
 ### Main Configuration File
 `.claude/hooks/config-manager/notification-config.json`
@@ -439,6 +493,21 @@ Set `telegram.enabled` to `true` in `notification-config.json`
 Run the test script to check your setup:
 ```bash
 python3 .claude/hooks/test-notifications.py
+```
+
+### Debug Mode
+Enable debug output to troubleshoot issues:
+
+**Windows:**
+```batch
+set CLAUDE_DEBUG=true
+debug-hooks.bat
+```
+
+**Linux/Mac:**
+```bash
+export CLAUDE_DEBUG=true
+python3 .claude/hooks/config-manager/notify-all.py Test PreToolUse
 ```
 
 ### Common Issues

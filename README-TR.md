@@ -68,6 +68,10 @@ claude-notification-hooks/
 │       │   ├── notify-all.py  # Ana bildirim dağıtıcı
 │       │   ├── notification-config.json  # Kullanıcı ayarları
 │       │   └── activity-logger.py
+│       ├── settings-manager/  # Yapılandırma araçları
+│       │   ├── configure.py   # Ana yapılandırma scripti
+│       │   ├── configure-notifications.bat
+│       │   └── configure-notifications.sh
 │       ├── voice-notifier/    # Sesli bildirim sistemi
 │       │   ├── smart-notification.py
 │       │   ├── sound-mapping.json
@@ -78,11 +82,15 @@ claude-notification-hooks/
 │       │       └── ...
 │       ├── telegram-bot/      # Telegram entegrasyonu
 │       │   ├── telegram-notifier.py
-│       │   └── telegram-config.json  # Bot bilgileri
+│       │   ├── telegram-config.json  # Bot bilgileri (gitignore'da)
+│       │   └── telegram-config.json.template
 │       ├── toast-notifier/    # Cross-platform masaüstü bildirimleri
 │       │   └── cross-platform-notifier.py
 │       └── utils/             # Yardımcı fonksiyonlar
 │           └── platform_utils.py
+├── configure-notifications.bat # Windows yapılandırma wrapper
+├── configure-notifications.sh  # Linux/Mac yapılandırma wrapper
+├── debug-hooks.bat            # Sorun giderme için debug aracı
 ├── README.md                  # İngilizce dokümantasyon
 ├── README-TR.md              # Bu dosya
 ├── CLAUDE.md                 # Claude için talimatlar
@@ -179,6 +187,19 @@ Kurulum scriptleri şunları yapacak:
 - Python scriptlerini çalıştırılabilir yapar (Linux/macOS)
 
 ### Adım 3: Yapılandırın (Opsiyonel)
+
+**Hızlı Yapılandırma (Yeni!):**
+Komut satırından tek komutla ayarları değiştirin:
+
+```bash
+# Windows
+configure-notifications.bat sound:0 telegram:1
+
+# Linux/Mac
+./configure-notifications.sh lang:tr quiet:23:00-07:00
+```
+
+**Manuel Yapılandırma:**
 `.claude/hooks/config-manager/notification-config.json` dosyasını düzenleyin:
 ```json
 {
@@ -245,6 +266,39 @@ Bu, hook arayüzünü açar. Hook'lar zaten `settings.json`'da tanımlıdır.
 - Detaylar için [Plugin Sistemi](#plugin-sistemi) bölümüne bakın
 
 ## ⚙️ Yapılandırma
+
+### Komut Satırı Yapılandırması (Yeni!)
+
+JSON dosyasını elle düzenlemek yerine, komut satırından kolayca yapılandırma yapabilirsiniz:
+
+```bash
+# Windows
+configure-notifications.bat [seçenekler]
+
+# Linux/Mac
+./configure-notifications.sh [seçenekler]
+```
+
+**Seçenekler:**
+- `sound:0/1` - Ses bildirimlerini kapat/aç
+- `telegram:0/1` - Telegram bildirimlerini kapat/aç
+- `toast:0/1` - Masaüstü bildirimlerini kapat/aç
+- `lang:en/tr` - Dil ayarı (İngilizce/Türkçe)
+- `quiet:0/1` - Sessiz saatleri kapat/aç
+- `quiet:HH:MM-HH:MM` - Sessiz saat aralığını ayarla
+- `status` - Mevcut yapılandırmayı göster
+
+**Örnekler:**
+```bash
+# Sesi kapat, Telegram'ı aç
+configure-notifications.bat sound:0 telegram:1
+
+# Türkçe yap ve sessiz saatleri ayarla
+configure-notifications.bat lang:tr quiet:23:00-07:00
+
+# Mevcut ayarları göster
+configure-notifications.bat status
+```
 
 ### Ana Yapılandırma Dosyası
 `.claude/hooks/config-manager/notification-config.json`
@@ -439,6 +493,21 @@ export TELEGRAM_CHAT_ID="chat-idiniz"
 Kurulumunuzu test etmek için:
 ```bash
 python3 .claude/hooks/test-notifications.py
+```
+
+### Debug Modu
+Sorunları gidermek için debug çıktısını etkinleştirin:
+
+**Windows:**
+```batch
+set CLAUDE_DEBUG=true
+debug-hooks.bat
+```
+
+**Linux/Mac:**
+```bash
+export CLAUDE_DEBUG=true
+python3 .claude/hooks/config-manager/notify-all.py Test PreToolUse
 ```
 
 ### Yaygın Sorunlar

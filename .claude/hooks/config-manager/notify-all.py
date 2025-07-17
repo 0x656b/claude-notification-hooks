@@ -77,6 +77,11 @@ def main():
     tool_name = sys.argv[1] if len(sys.argv) > 1 else "default"
     event_type = sys.argv[2] if len(sys.argv) > 2 else "PreToolUse"
     
+    # Debug log
+    debug_mode = os.environ.get('CLAUDE_DEBUG', '').lower() == 'true'
+    if debug_mode:
+        print(f"[DEBUG] Tool: {tool_name}, Event: {event_type}")
+    
     script_dir = os.path.dirname(os.path.abspath(__file__))
     config = load_config()
     
@@ -116,11 +121,17 @@ def main():
             if tool_name in custom_tools:
                 # Bu tool için özel ayar var
                 tool_events = custom_tools[tool_name]
+                if debug_mode:
+                    print(f"[DEBUG] {plugin_name}: Custom settings for {tool_name} = {tool_events}")
                 if not tool_events.get(event_type, False):
+                    if debug_mode:
+                        print(f"[DEBUG] {plugin_name}: Skipping {tool_name}/{event_type} (custom=false)")
                     continue
             else:
                 # Tool için özel ayar yok, genel event ayarını kullan
                 if not plugin_config.get("events", {}).get(event_type, False):
+                    if debug_mode:
+                        print(f"[DEBUG] {plugin_name}: Skipping {tool_name}/{event_type} (global=false)")
                     continue
         else:
             # Tool-level kontrol kapalı, sadece genel event kontrolü

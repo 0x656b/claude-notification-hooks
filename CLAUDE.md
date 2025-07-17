@@ -37,6 +37,19 @@ Claude Code Hook Notification System - A comprehensive cross-platform notificati
 
 ## Important Commands
 
+### Quick Configuration (New!)
+Configure notifications without editing JSON:
+```bash
+# Windows
+configure-notifications.bat sound:0 telegram:1 lang:tr
+
+# Linux/Mac
+./configure-notifications.sh toast:0 quiet:23:00-07:00
+
+# Show current configuration
+configure-notifications.bat status
+```
+
 ### Test Installation
 ```bash
 python3 .claude/hooks/test-notifications.py
