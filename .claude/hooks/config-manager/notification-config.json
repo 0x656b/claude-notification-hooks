@@ -46,7 +46,7 @@
           }
         }
       },
-      "_comment": "Sesli bildirimler - MP3 ve beep sesleri"
+      "_comment": "Audio notifications - MP3 and beep sounds"
     },
     "telegram": {
       "enabled": true,
@@ -58,7 +58,7 @@
         "PreToolUse": false,
         "PostToolUse": false
       },
-      "_comment": "Telegram bot bildirimleri"
+      "_comment": "Telegram bot notifications"
     },
     "desktop_toast": {
       "enabled": true,
@@ -80,17 +80,13 @@
     "mute": [
       "sound"
     ],
-    "allow": [
-      "telegram",
-      "desktop_toast"
-    ],
-    "_comment": "mute: sessiz saatlerde kapatılacak plugin'ler, allow: her zaman çalışacak plugin'ler"
+    "_comment": "mute: plugins to disable during quiet hours. Plugins not in the list will continue to work."
   },
   "logging": {
     "enabled": false,
     "max_size_mb": 10,
     "rotate": true,
-    "_comment": "Debug için enabled: true yapın"
+    "_comment": "Set enabled: true for debugging"
   },
   "culture": {
     "language": "en",

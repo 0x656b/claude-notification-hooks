@@ -61,16 +61,9 @@ def should_run_plugin(plugin_name, quiet_mode, quiet_config):
     if not quiet_mode:
         return True
     
-    # Mute listesinde varsa çalıştırma
-    if plugin_name in quiet_config.get("mute", []):
-        return False
-    
-    # Allow listesinde varsa çalıştır
-    if plugin_name in quiet_config.get("allow", []):
-        return True
-    
-    # Ne mute ne allow'da yoksa, varsayılan davranış: çalıştırma
-    return False
+    # Quiet hours aktif - mute listesindeki plugin'leri kapat
+    muted_plugins = quiet_config.get("mute", [])
+    return plugin_name not in muted_plugins
 
 
 def main():
@@ -102,45 +95,50 @@ def main():
             continue
             
         # Bu event için bildirim gönderilecek mi?
-        # Önce tool-specific kontrol
+        # AND logic: events flag && (tools disabled OR tool specific flag)
+        
+        # 1. Global event flag kontrolü
+        global_event_enabled = plugin_config.get("events", {}).get(event_type, False)
+        
+        # 2. Tool-specific kontrol
         tools_config = plugin_config.get("tools", {})
+        tool_specific_enabled = True  # Varsayılan: tool kontrolü yoksa izin ver
+        
         if tools_config.get("enabled", False):
             # Tool-level kontrol aktif
-            # 1. Whitelist kontrolü
+            
+            # Whitelist kontrolü
             whitelist = tools_config.get("whitelist", [])
             if whitelist and tool_name not in whitelist:
-                continue
+                tool_specific_enabled = False
                 
-            # 2. Blacklist kontrolü
+            # Blacklist kontrolü
             blacklist = tools_config.get("blacklist", [])
             if blacklist and tool_name in blacklist:
-                continue
+                tool_specific_enabled = False
                 
-            # 3. Custom tool settings kontrolü
+            # Custom tool settings kontrolü
             custom_tools = tools_config.get("custom", {})
             if tool_name in custom_tools:
-                # Bu tool için özel ayar var
-                tool_events = custom_tools[tool_name]
+                # Bu tool için özel ayar var - AND logic uygula
+                tool_event_flag = custom_tools[tool_name].get(event_type, True)
+                tool_specific_enabled = tool_event_flag
                 if debug_mode:
-                    print(f"[DEBUG] {plugin_name}: Custom settings for {tool_name} = {tool_events}")
-                if not tool_events.get(event_type, False):
-                    if debug_mode:
-                        print(f"[DEBUG] {plugin_name}: Skipping {tool_name}/{event_type} (custom=false)")
-                    continue
-            else:
-                # Tool için özel ayar yok, genel event ayarını kullan
-                if not plugin_config.get("events", {}).get(event_type, False):
-                    if debug_mode:
-                        print(f"[DEBUG] {plugin_name}: Skipping {tool_name}/{event_type} (global=false)")
-                    continue
-        else:
-            # Tool-level kontrol kapalı, sadece genel event kontrolü
-            if not plugin_config.get("events", {}).get(event_type, False):
-                continue
+                    print(f"[DEBUG] {plugin_name}: {tool_name}.{event_type} custom={tool_event_flag}")
+        
+        # AND logic: Her iki flag da true olmalı
+        should_notify = global_event_enabled and tool_specific_enabled
+        
+        if debug_mode:
+            print(f"[DEBUG] {plugin_name}: {tool_name}/{event_type} - global={global_event_enabled}, tool={tool_specific_enabled}, result={should_notify}")
+        
+        if not should_notify:
+            continue
             
         # Quiet hours kontrolü
         if not should_run_plugin(plugin_name, quiet_mode, quiet_config):
-            print(f"{plugin_name} sessiz saatlerde kapalı")
+            if debug_mode:
+                print(f"[DEBUG] {plugin_name} muted during quiet hours")
             continue
         
         # Script yolu belirtilmemiş mi?

@@ -340,8 +340,7 @@ configure-notifications.bat status
     "enabled": false,
     "start": "23:00",
     "end": "07:00",
-    "mute": ["sound"],
-    "allow": ["telegram", "desktop_toast"]
+    "mute": ["sound"]  // Plugins listed here will be muted during quiet hours
   },
   "logging": {
     "enabled": false,
@@ -360,23 +359,27 @@ configure-notifications.bat status
 
 ### Tool-Level Control
 
-Fine-tune which tools trigger notifications for any plugin. This feature is available for all plugins, not just sound:
+Fine-tune which tools trigger notifications for any plugin. This feature is available for all plugins, not just sound.
+
+**Important:** The system uses AND logic between global events and tool-specific settings:
+- A notification will only trigger if BOTH the global event flag AND the tool-specific flag are `true`
+- For example: If `events.PreToolUse: true` and `custom.Bash.PreToolUse: false`, Bash will NOT trigger notifications
 
 ```json
 "sound": {
   "enabled": true,
   "events": {
-    "PreToolUse": true  // Global setting
+    "PreToolUse": true  // Global setting - must be true for ANY PreToolUse notifications
   },
   "tools": {
     "enabled": true,    // Enable tool-specific control
     "custom": {
-      "Bash": {"PreToolUse": true, "PostToolUse": false},
-      "Edit": {"PreToolUse": true, "PostToolUse": false},
-      "Read": {"PreToolUse": true, "PostToolUse": false},
-      "Grep": {"PreToolUse": false, "PostToolUse": false},  // Silent
-      "LS": {"PreToolUse": false, "PostToolUse": false},     // Silent
-      "Glob": {"PreToolUse": false, "PostToolUse": false}    // Silent
+      "Bash": {"PreToolUse": true, "PostToolUse": false},   // Will sound (true AND true)
+      "Edit": {"PreToolUse": true, "PostToolUse": false},   // Will sound (true AND true)
+      "Read": {"PreToolUse": true, "PostToolUse": false},   // Will sound (true AND true)
+      "Grep": {"PreToolUse": false, "PostToolUse": false},  // Silent (true AND false)
+      "LS": {"PreToolUse": false, "PostToolUse": false},    // Silent (true AND false)
+      "Glob": {"PreToolUse": false, "PostToolUse": false}   // Silent (true AND false)
     }
   }
 }
@@ -385,7 +388,7 @@ Fine-tune which tools trigger notifications for any plugin. This feature is avai
 **Options:**
 - `whitelist`: Only these tools will make sounds
 - `blacklist`: These tools will never make sounds
-- `custom`: Per-tool event settings (overrides global events)
+- `custom`: Per-tool event settings (uses AND logic with global events)
 
 ### Language Settings
 
@@ -411,11 +414,39 @@ Customize which tool triggers which sound:
   "tool_sounds": {
     "Bash": "bash.mp3",
     "Edit": "editing.mp3",
-    "Read": "listing.mp3"
+    "MultiEdit": "editing.mp3",
+    "Write": "editing.mp3",
+    "Read": "listing.mp3",
+    "LS": "listing.mp3",
+    "Glob": "listing.mp3",
+    "Grep": "listing.mp3",
+    "WebSearch": "listing.mp3",
+    "Git": "commit.mp3",
+    "PR": "pr.mp3",
+    "Test": "test.mp3",
+    "Task": "bash.mp3"
   },
   "event_sounds": {
-    "Stop": "ready.mp3",
-    "Notification": "ready.mp3"
+    "Stop": "stop.mp3",
+    "Start": "ready.mp3",
+    "Notification": "waiting.mp3",
+    "SubagentStop": "suba.mp3",
+    "Error": "error.mp3"
+  },
+  "categories": {
+    "execution": ["Bash", "Task"],
+    "editing": ["Edit", "MultiEdit", "Write", "TodoWrite"],
+    "reading": ["Read", "LS", "Glob", "Grep", "WebSearch"],
+    "version_control": ["Git", "PR"]
+  },
+  "beep_fallback": {
+    "enabled": true,
+    "settings": {
+      "Stop": {"frequency": 1200, "duration": 500},
+      "Error": {"frequency": 400, "duration": 800},
+      "Bash": {"frequency": 800, "duration": 200},
+      "default": {"frequency": 1000, "duration": 300}
+    }
   }
 }
 ```
@@ -774,8 +805,8 @@ Control which plugins work during quiet hours:
   "enabled": true,
   "start": "23:00",
   "end": "07:00",
-  "mute": ["sound", "discord"],  // These plugins won't run
-  "allow": ["telegram", "email"]  // These will always run
+  "mute": ["sound", "discord"]  // These plugins won't run during quiet hours
+  // Plugins not listed in 'mute' will continue to work normally
 }
 ```
 
