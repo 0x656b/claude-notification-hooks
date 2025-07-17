@@ -1,0 +1,91 @@
+# Simple example: Using notification hooks in your existing workflows
+# This shows how to add Claude Code notifications to any GitHub Action
+
+name: Build with Notifications
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Set up notifications
+        run: |
+          # Install only what we need for notifications
+          pip install python-telegram-bot
+          
+          # Configure Telegram (using secrets)
+          mkdir -p .claude/hooks/telegram-bot
+          echo '{
+            "bot_token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
+            "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}"
+          }' > .claude/hooks/telegram-bot/telegram-config.json
+          
+          # Simple notification function
+          notify() {
+            python3 .claude/hooks/telegram-bot/telegram-notifier.py "$1" "$2"
+          }
+      
+      - name: Build project
+        run: |
+          source <(grep -s notify <<< 'notify() { python3 .claude/hooks/telegram-bot/telegram-notifier.py "$1" "$2"; }')
+          
+          # Notify start
+          notify "Build" "Start"
+          
+          # Your build commands here
+          echo "Building project..."
+          # make build
+          # npm run build
+          # cargo build --release
+          
+          # Notify completion
+          notify "Build" "Stop"
+      
+      - name: Run tests
+        run: |
+          source <(grep -s notify <<< 'notify() { python3 .claude/hooks/telegram-bot/telegram-notifier.py "$1" "$2"; }')
+          
+          # Notify test start
+          notify "Test" "Start"
+          
+          # Your test commands here
+          echo "Running tests..."
+          # pytest
+          # npm test
+          # cargo test
+          
+          # Notify test completion
+          notify "Test" "Stop"
+      
+      - name: Deploy (on success)
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          source <(grep -s notify <<< 'notify() { python3 .claude/hooks/telegram-bot/telegram-notifier.py "$1" "$2"; }')
+          
+          # Notify deployment
+          notify "Deploy" "Notification"
+          
+          echo "Deploying to production..."
+          # Your deployment commands here
+          
+          notify "Deploy" "Stop"
+
+# Minimal setup required:
+# 1. Copy just the notification scripts you need
+# 2. Set up secrets in GitHub:
+#    - TELEGRAM_BOT_TOKEN
+#    - TELEGRAM_CHAT_ID
+# 3. That's it! You'll get notifications for your builds

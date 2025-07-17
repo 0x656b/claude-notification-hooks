@@ -1,0 +1,278 @@
+# Example GitHub Actions workflow using Claude Code with notifications
+# This demonstrates how to integrate Claude Code hooks in CI/CD pipelines
+
+name: Claude Code Development Assistant
+
+on:
+  # Manual trigger with input
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task for Claude to perform'
+        required: true
+        default: 'Review and improve code quality'
+        type: choice
+        options:
+          - 'Review and improve code quality'
+          - 'Add tests for untested functions'
+          - 'Update documentation'
+          - 'Refactor for better performance'
+          - 'Fix linting issues'
+      
+      notify_telegram:
+        description: 'Send Telegram notifications'
+        required: false
+        default: true
+        type: boolean
+      
+      notify_discord:
+        description: 'Send Discord notifications (if configured)'
+        required: false
+        default: false
+        type: boolean
+
+  # Trigger on PR comments
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-assistant:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      (github.event.issue.pull_request && contains(github.event.comment.body, '/claude'))
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Claude Code
+        run: |
+          # Install Claude Code CLI (example - adjust based on actual installation method)
+          # pip install claude-code-cli
+          # For now, we'll simulate the installation
+          echo "Claude Code CLI would be installed here"
+      
+      - name: Install notification dependencies
+        run: |
+          pip install -r requirements.txt
+          # Install additional CI dependencies
+          pip install discord-webhook  # For Discord
+      
+      - name: Configure notifications
+        run: |
+          # Set up notification config for CI environment
+          mkdir -p .claude/hooks/telegram-bot
+          mkdir -p .claude/hooks/discord-bot
+          
+          # Configure Telegram if enabled
+          if [[ "${{ inputs.notify_telegram }}" == "true" || "${{ github.event_name }}" == "issue_comment" ]]; then
+            echo '{
+              "bot_token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
+              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}"
+            }' > .claude/hooks/telegram-bot/telegram-config.json
+          fi
+          
+          # Update notification config
+          python3 -c "
+          import json
+          config = {
+            'notifications': {
+              'sound': {
+                'enabled': False,  # No sound in CI
+                'script': 'voice-notifier/smart-notification.py',
+                'events': {}
+              },
+              'telegram': {
+                'enabled': ${{ inputs.notify_telegram || github.event_name == 'issue_comment' }},
+                'script': 'telegram-bot/telegram-notifier.py',
+                'events': {
+                  'Stop': True,
+                  'Notification': True,
+                  'SubagentStop': True
+                }
+              },
+              'github_comment': {
+                'enabled': True,
+                'script': 'github-actions/comment-notifier.py',
+                'events': {
+                  'Stop': True,
+                  'Notification': True
+                }
+              }
+            },
+            'quiet_hours': {'enabled': False},
+            'logging': {'enabled': True, 'max_size_mb': 50}
+          }
+          with open('.claude/hooks/config-manager/notification-config.json', 'w') as f:
+            json.dump(config, f, indent=2)
+          "
+      
+      - name: Create GitHub comment notifier
+        run: |
+          mkdir -p .claude/hooks/github-actions
+          cat > .claude/hooks/github-actions/comment-notifier.py << 'EOF'
+          #!/usr/bin/env python3
+          import sys
+          import os
+          import json
+          import urllib.request
+          import urllib.error
+          
+          def post_comment(message):
+              # Get GitHub context
+              github_token = os.environ.get('GITHUB_TOKEN')
+              repo = os.environ.get('GITHUB_REPOSITORY')
+              issue_number = os.environ.get('ISSUE_NUMBER')
+              
+              if not all([github_token, repo, issue_number]):
+                  print("Missing GitHub environment variables")
+                  return
+              
+              # Prepare API request
+              url = f"https://api.github.com/repos/{repo}/issues/{issue_number}/comments"
+              headers = {
+                  'Authorization': f'token {github_token}',
+                  'Content-Type': 'application/json'
+              }
+              
+              data = json.dumps({'body': message}).encode('utf-8')
+              
+              try:
+                  req = urllib.request.Request(url, data=data, headers=headers)
+                  with urllib.request.urlopen(req) as response:
+                      print(f"Posted comment: {response.status}")
+              except Exception as e:
+                  print(f"Failed to post comment: {e}")
+          
+          if __name__ == "__main__":
+              tool_name = sys.argv[1] if len(sys.argv) > 1 else "Unknown"
+              event_type = sys.argv[2] if len(sys.argv) > 2 else "Unknown"
+              
+              # Format message based on event
+              if event_type == "Stop":
+                  message = "✅ **Claude Code completed the task!**"
+              elif event_type == "Notification":
+                  message = f"🔔 **Claude Code notification**: Tool `{tool_name}` requires attention"
+              else:
+                  message = f"📌 **Claude Code event**: {event_type} from {tool_name}"
+              
+              post_comment(message)
+          EOF
+          chmod +x .claude/hooks/github-actions/comment-notifier.py
+      
+      - name: Determine task
+        id: determine-task
+        run: |
+          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+            # Extract task from comment
+            TASK=$(echo "${{ github.event.comment.body }}" | sed 's/^\/claude //')
+            echo "task=$TASK" >> $GITHUB_OUTPUT
+          else
+            echo "task=${{ inputs.task }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run Claude Code with hooks
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # This is where Claude Code would run with the task
+          # For demonstration, we'll simulate it
+          echo "Running Claude Code with task: ${{ steps.determine-task.outputs.task }}"
+          
+          # In real implementation:
+          # claude-code --task "${{ steps.determine-task.outputs.task }}" --hooks-enabled
+          
+          # Simulate some work and trigger hooks
+          echo "Simulating Claude Code execution..."
+          python3 .claude/hooks/config-manager/notify-all.py "Bash" "PreToolUse"
+          sleep 2
+          python3 .claude/hooks/config-manager/notify-all.py "Edit" "PreToolUse"
+          sleep 2
+          python3 .claude/hooks/config-manager/notify-all.py "Task" "Stop"
+      
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: claude-code-logs
+          path: |
+            .claude/hooks/*.log
+            .claude/hooks/activity.log
+            .claude/hooks/notifications.log
+      
+      - name: Post summary
+        if: always()
+        run: |
+          echo "## Claude Code Task Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Task**: ${{ steps.determine-task.outputs.task }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f .claude/hooks/activity.log ]; then
+            echo "### Activity Log" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            tail -20 .claude/hooks/activity.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Example job for Discord notifications
+  discord-notify:
+    runs-on: ubuntu-latest
+    needs: claude-assistant
+    if: |
+      always() && 
+      (inputs.notify_discord == true || 
+       (github.event_name == 'issue_comment' && contains(github.event.comment.body, 'notify:discord')))
+    
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{
+                 "content": "Claude Code task completed!",
+                 "embeds": [{
+                   "title": "GitHub Actions - Claude Code",
+                   "description": "Task: ${{ needs.claude-assistant.outputs.task }}",
+                   "color": 5814783,
+                   "fields": [
+                     {"name": "Repository", "value": "${{ github.repository }}", "inline": true},
+                     {"name": "Status", "value": "${{ needs.claude-assistant.result }}", "inline": true}
+                   ]
+                 }]
+               }' \
+               $DISCORD_WEBHOOK
+
+# Usage examples:
+# 
+# 1. Manual trigger:
+#    - Go to Actions tab
+#    - Select "Claude Code Development Assistant"
+#    - Click "Run workflow"
+#    - Choose task and notification preferences
+#
+# 2. PR comment trigger:
+#    - Comment on any PR with: /claude fix the failing tests
+#    - Claude will analyze and fix the tests
+#    - Notifications will be sent based on configuration
+#
+# 3. Scheduled runs (add to 'on:'):
+#    schedule:
+#      - cron: '0 9 * * 1'  # Weekly code review on Mondays
+#
+# Required secrets:
+# - ANTHROPIC_API_KEY: Your Claude API key
+# - TELEGRAM_BOT_TOKEN: (Optional) For Telegram notifications
+# - TELEGRAM_CHAT_ID: (Optional) For Telegram notifications
+# - DISCORD_WEBHOOK_URL: (Optional) For Discord notifications

@@ -1,0 +1,15 @@
+# Claude Code Hook Notification System - Python Dependencies
+
+# Core dependencies (all platforms)
+plyer>=2.1.0
+python-telegram-bot>=20.0
+
+# Windows specific
+pygame>=2.0.0 ; sys_platform == 'win32'
+windows-toasts>=1.0.0 ; sys_platform == 'win32'
+
+# Optional dependencies for custom plugins
+# Uncomment as needed:
+# discord-webhook  # For Discord notifications
+# slack-sdk       # For Slack notifications
+# requests        # For webhook-based notifications
