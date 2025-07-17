@@ -34,6 +34,10 @@ Claude Code Hook Notification System - A comprehensive cross-platform notificati
 3. **Tool-level Control**: Fine-grained control over which tools trigger notifications
 4. **Cross-platform**: Windows, macOS, and Linux support
 5. **Quiet Hours**: Configurable silent periods with per-plugin control
+6. **Smart Sound System**: 
+   - Tools defined in sound-mapping.json play their specific sounds
+   - Undefined tools are silent during PreToolUse/PostToolUse
+   - Stop events always play ready.mp3 regardless of tool
 
 ## Important Commands
 
@@ -121,6 +125,11 @@ In `notification-config.json`:
 4. **Telegram not working**
    - Check credentials in telegram-config.json
    - Ensure bot has received `/start` command
+
+5. **Windows variable substitution**
+   - Windows has issues with `${TOOL_NAME}` variables in hooks
+   - This project uses individual hook definitions for each tool as a workaround
+   - See `.claude/settings.json` for the implementation
 
 ## Security Notes
 

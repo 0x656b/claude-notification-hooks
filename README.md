@@ -666,12 +666,14 @@ Add your own hooks to `settings.json`:
 ### Hook Parameters
 
 Hooks receive parameters about the event:
-- `%TOOL_NAME%` - Name of the tool used
-- `%EVENT_TYPE%` - Type of event triggered
+- `${TOOL_NAME}` - Name of the tool used (Note: Windows has issues with this variable substitution)
+- `${EVENT_TYPE}` - Type of event triggered
 
-Example:
+**Windows Note:** Due to variable substitution issues on Windows, this project uses individual hook definitions for each tool instead of using `${TOOL_NAME}`. See `.claude/settings.json` for the implementation.
+
+Example (Linux/Mac):
 ```bash
-python3 notify.py %TOOL_NAME% %EVENT_TYPE%
+python3 notify.py ${TOOL_NAME} ${EVENT_TYPE}
 ```
 
 ### Plugin System

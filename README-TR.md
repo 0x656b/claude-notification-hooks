@@ -608,12 +608,14 @@ Claude Code, bazı tuhaflıkları olan sandbox ortamında çalışır:
 ### Hook Parametreleri
 
 Hook'lar olay hakkında parametreler alır:
-- `%TOOL_NAME%` - Kullanılan aracın adı
-- `%EVENT_TYPE%` - Tetiklenen olay türü
+- `${TOOL_NAME}` - Kullanılan aracın adı (Not: Windows'ta bu değişken yerleştirme ile sorunlar var)
+- `${EVENT_TYPE}` - Tetiklenen olay türü
 
-Örnek:
+**Windows Notu:** Windows'ta değişken yerleştirme sorunları nedeniyle, bu proje `${TOOL_NAME}` kullanmak yerine her araç için ayrı hook tanımları kullanır. Uygulama için `.claude/settings.json` dosyasına bakın.
+
+Örnek (Linux/Mac):
 ```bash
-python3 notify.py %TOOL_NAME% %EVENT_TYPE%
+python3 notify.py ${TOOL_NAME} ${EVENT_TYPE}
 ```
 
 ### Plugin Sistemi

@@ -87,15 +87,24 @@ def play_sound_for_tool(tool_name="default", event_type="PreToolUse"):
         # Ses dosyasını belirle
         sound_file = None
         
-        # Önce tool_sounds'a bak
-        if tool_name in sound_mapping.get("tool_sounds", {}):
-            sound_file = sound_mapping["tool_sounds"][tool_name]
-        # Sonra event_sounds'a bak
-        elif event_type in sound_mapping.get("event_sounds", {}):
+        # Önce event_sounds'a bak (Stop, Error gibi özel durumlar için)
+        if event_type in sound_mapping.get("event_sounds", {}):
             sound_file = sound_mapping["event_sounds"][event_type]
-        # Varsayılan
+        # Sonra tool_sounds'a bak
+        elif tool_name in sound_mapping.get("tool_sounds", {}):
+            sound_file = sound_mapping["tool_sounds"][tool_name]
+        # Tanımlı değilse sessiz geç (varsayılan sesi kullanma)
         else:
-            sound_file = sound_mapping.get("default_sound", "ready.mp3")
+            # Eğer event_type PreToolUse/PostToolUse ise ve tool tanımlı değilse, sessiz geç
+            if event_type in ["PreToolUse", "PostToolUse"]:
+                message = f"[{timestamp}] {event_type}: {tool_name} → 🔇 Tanımsız tool, sessiz"
+                if logging_enabled:
+                    with open(log_file, "a", encoding="utf-8") as f:
+                        f.write(message + "\n")
+                return  # Sessiz çık
+            # Diğer durumlarda varsayılan sesi kullan
+            else:
+                sound_file = sound_mapping.get("default_sound", "ready.mp3")
             
         sound_path = os.path.join(voice_dir, sound_file)
         

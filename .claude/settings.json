@@ -2,22 +2,328 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "*",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py %TOOL_NAME% PreToolUse"
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Bash PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Edit PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py MultiEdit PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Read PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "LS",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py LS PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Glob PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Grep PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Git",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Git PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "PR",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py PR PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Test",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Test PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Write PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py Task PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "TodoWrite",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py TodoWrite PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py WebSearch PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py WebFetch PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "NotebookRead",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py NotebookRead PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py NotebookEdit PreToolUse"
+          }
+        ]
+      },
+      {
+        "matcher": "exit_plan_mode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/notify-all.py exit_plan_mode PreToolUse"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "*",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py %TOOL_NAME%"
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Bash"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Edit"
+          }
+        ]
+      },
+      {
+        "matcher": "MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py MultiEdit"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Read"
+          }
+        ]
+      },
+      {
+        "matcher": "LS",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py LS"
+          }
+        ]
+      },
+      {
+        "matcher": "Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Glob"
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Grep"
+          }
+        ]
+      },
+      {
+        "matcher": "Git",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Git"
+          }
+        ]
+      },
+      {
+        "matcher": "PR",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py PR"
+          }
+        ]
+      },
+      {
+        "matcher": "Test",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Test"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Write"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py Task"
+          }
+        ]
+      },
+      {
+        "matcher": "TodoWrite",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py TodoWrite"
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py WebSearch"
+          }
+        ]
+      },
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py WebFetch"
+          }
+        ]
+      },
+      {
+        "matcher": "NotebookRead",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py NotebookRead"
+          }
+        ]
+      },
+      {
+        "matcher": "NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py NotebookEdit"
+          }
+        ]
+      },
+      {
+        "matcher": "exit_plan_mode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/config-manager/activity-logger.py exit_plan_mode"
           }
         ]
       }
