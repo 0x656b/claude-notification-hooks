@@ -3,6 +3,7 @@
 # Core dependencies (all platforms)
 plyer>=2.1.0
 python-telegram-bot>=20.0
+PyYAML>=6.0
 
 # Windows specific
 pygame>=2.0.0 ; sys_platform == 'win32'

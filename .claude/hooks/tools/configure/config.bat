@@ -21,10 +21,10 @@ if errorlevel 1 (
     set PYTHON=python
 )
 
-:: Set the config file path as environment variable
-set CLAUDE_NOTIFICATION_CONFIG=%SCRIPT_DIR%.claude\hooks\config-manager\notification-config.json
+:: Set the config file path as environment variable (v2.0 structure)
+set CLAUDE_NOTIFICATION_CONFIG=%SCRIPT_DIR%..\..\core\config.yaml
 
-:: Run the configuration tool with absolute path
-%PYTHON% "%SCRIPT_DIR%.claude\hooks\settings-manager\configure.py" %*
+:: Run the configuration tool with relative path
+%PYTHON% "%SCRIPT_DIR%configure.py" %*
 
 endlocal

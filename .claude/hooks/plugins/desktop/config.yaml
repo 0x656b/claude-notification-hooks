@@ -1,0 +1,23 @@
+# Desktop Notification Plugin Configuration
+
+# Plugin metadata
+name: "Desktop Notification Plugin"
+description: "Shows desktop toast notifications"
+version: "1.0.0"
+
+# Notification settings
+title: "Claude Code"
+duration: 5  # seconds
+icon: ""  # Path to icon file (optional)
+
+# Platform-specific settings
+windows:
+  app_id: "Claude.Code.Notifications"
+  use_powershell: false
+
+macos:
+  sound: "default"
+  
+linux:
+  urgency: "normal"  # low, normal, critical
+  category: "dev"

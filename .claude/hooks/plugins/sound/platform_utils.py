@@ -72,7 +72,7 @@ def get_beep_command():
     if system == 'windows':
         return None  # Uses winsound.Beep
     elif system == 'macos':
-        return 'printf "\\a"'
+        return 'osascript -e "beep 1" 2>/dev/null || printf "\\a"'
     elif system == 'linux':
         return 'printf "\\a" || beep 2>/dev/null || play -n synth 0.3 sine 1000 2>/dev/null'
 

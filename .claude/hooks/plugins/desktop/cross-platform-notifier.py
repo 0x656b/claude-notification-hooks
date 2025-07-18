@@ -9,9 +9,39 @@ import datetime
 import subprocess
 import json
 
+def load_config():
+    """Load plugin config (YAML first, then JSON fallback)"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Try YAML first
+    yaml_config = os.path.join(script_dir, "config.yaml")
+    try:
+        import yaml
+        with open(yaml_config, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except ImportError:
+        pass  # PyYAML not installed
+    except (FileNotFoundError, Exception):
+        pass  # YAML config not found
+    
+    # Fallback to JSON or defaults
+    return {
+        "title": "Claude Code",
+        "duration": 5,
+        "icon": ""
+    }
+
 # Platform utils'i import et
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
-from platform_utils import get_platform, get_notification_command
+try:
+    from platform_utils import get_platform, get_notification_command
+except ImportError:
+    # Fallback implementations
+    def get_platform():
+        import platform
+        return platform.system().lower()
+    
+    def get_notification_command():
+        return None
 
 # Emoji mapping
 EMOJI_MAP = {

@@ -1,0 +1,65 @@
+culture:
+  language: en
+logging:
+  enabled: false
+  max_size_mb: 10
+  rotate: true
+plugins:
+  desktop_toast:
+    enabled: true
+    events:
+      Notification: true
+      PostToolUse: false
+      PreToolUse: false
+      Stop: true
+      SubagentStop: true
+    script: ../plugins/desktop/cross-platform-notifier.py
+  sound:
+    enabled: true
+    events:
+      Notification: true
+      PostToolUse: false
+      PreToolUse: true
+      Stop: true
+    script: ../plugins/sound/smart-notification.py
+    tools:
+      blacklist: []
+      custom:
+        Bash:
+          PostToolUse: false
+          PreToolUse: true
+        Edit:
+          PostToolUse: false
+          PreToolUse: true
+        Glob:
+          PostToolUse: false
+          PreToolUse: false
+        Grep:
+          PostToolUse: false
+          PreToolUse: false
+        LS:
+          PostToolUse: false
+          PreToolUse: false
+        Read:
+          PostToolUse: false
+          PreToolUse: true
+        Write:
+          PostToolUse: false
+          PreToolUse: true
+      enabled: true
+      whitelist: []
+  telegram:
+    enabled: true
+    events:
+      Notification: true
+      PostToolUse: false
+      PreToolUse: false
+      Stop: true
+      SubagentStop: true
+    script: ../plugins/telegram/telegram-notifier.py
+quiet_hours:
+  enabled: true
+  end: 07:00
+  mute:
+  - sound
+  start: '23:00'

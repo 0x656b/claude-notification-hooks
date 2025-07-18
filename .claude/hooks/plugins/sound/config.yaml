@@ -1,0 +1,71 @@
+# Sound Plugin Configuration
+
+# Plugin metadata
+name: "Sound Notification Plugin"
+description: "Plays audio notifications for Claude Code events"
+version: "1.0.0"
+
+# Sound settings
+volume: 100
+audio_directory: "voice"
+
+# Tool-to-sound mapping
+tool_sounds:
+  Bash: "bash.mp3"
+  Edit: "editing.mp3"
+  MultiEdit: "editing.mp3"
+  Write: "editing.mp3"
+  TodoWrite: "editing.mp3"
+  NotebookEdit: "editing.mp3"
+  Read: "listing.mp3"
+  LS: "listing.mp3"
+  Glob: "listing.mp3"
+  Grep: "listing.mp3"
+  WebSearch: "listing.mp3"
+  WebFetch: "listing.mp3"
+  NotebookRead: "listing.mp3"
+  Git: "commit.mp3"
+  PR: "pr.mp3"
+  Test: "test.mp3"
+  Task: "bash.mp3"
+  exit_plan_mode: "ready.mp3"
+
+# Event-to-sound mapping
+event_sounds:
+  Stop: "stop.mp3"
+  Start: "ready.mp3"
+  Notification: "waiting.mp3"
+  SubagentStop: "suba.mp3"
+  Error: "error.mp3"
+  Success: "ready.mp3"
+  PreToolUse: null
+  PostToolUse: null
+
+# Tool categories for easier management
+categories:
+  execution: ["Bash", "Task"]
+  editing: ["Edit", "MultiEdit", "Write", "TodoWrite", "NotebookEdit"]
+  reading: ["Read", "LS", "Glob", "Grep", "WebSearch", "WebFetch", "NotebookRead"]
+  version_control: ["Git", "PR"]
+  testing: ["Test"]
+  planning: ["exit_plan_mode"]
+
+# Fallback settings
+default_sound: "ready.mp3"
+
+# Beep fallback when MP3 files are missing
+beep_fallback:
+  enabled: true
+  settings:
+    Stop: {frequency: 1200, duration: 500}
+    Error: {frequency: 400, duration: 800}
+    Success: {frequency: 1400, duration: 300}
+    Bash: {frequency: 800, duration: 200}
+    Task: {frequency: 850, duration: 250}
+    Edit: {frequency: 900, duration: 250}
+    Write: {frequency: 950, duration: 200}
+    Read: {frequency: 1100, duration: 150}
+    Grep: {frequency: 1050, duration: 180}
+    Git: {frequency: 1000, duration: 400}
+    Test: {frequency: 1300, duration: 350}
+    default: {frequency: 1000, duration: 300}

@@ -7,12 +7,20 @@ import json
 import sys
 import os
 
-# Default config file path (relative to script)
+# Try to import yaml, fallback to json
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+
+# Default config file path (v2.0 structure)
 DEFAULT_CONFIG_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), 
     "..", 
-    "config-manager", 
-    "notification-config.json"
+    "..", 
+    "core", 
+    "config.yaml"
 )
 
 # Check if config path was passed as environment variable (from batch/shell script)
@@ -24,26 +32,61 @@ if '--debug' in sys.argv:
     print(f"Environment variable: {os.environ.get('CLAUDE_NOTIFICATION_CONFIG', 'Not set')}")
 
 def load_config():
-    """Load the current configuration"""
+    """Load the current configuration (YAML or JSON)"""
     try:
         with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            content = f.read()
+            
+            if CONFIG_FILE.endswith('.yaml'):
+                if YAML_AVAILABLE:
+                    return yaml.safe_load(content)
+                else:
+                    print("Error: YAML file detected but PyYAML is not installed")
+                    print("Please install PyYAML: pip install PyYAML")
+                    sys.exit(1)
+            else:
+                return json.loads(content)
     except FileNotFoundError:
         print(f"Error: Configuration file not found at: {CONFIG_FILE}")
         print(f"Current working directory: {os.getcwd()}")
         sys.exit(1)
     except json.JSONDecodeError as e:
         print(f"Error: Invalid JSON in configuration file: {e}")
+        print(f"Config file path: {CONFIG_FILE}")
+        sys.exit(1)
+    except yaml.YAMLError as e:
+        print(f"Error: Invalid YAML in configuration file: {e}")
+        print(f"Config file path: {CONFIG_FILE}")
         sys.exit(1)
     except Exception as e:
         print(f"Error reading configuration: {e}")
         print(f"Config file path: {CONFIG_FILE}")
+        print(f"YAML available: {YAML_AVAILABLE}")
         sys.exit(1)
+
+def load_sound_config():
+    """Load sound plugin configuration"""
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        sound_config_path = os.path.join(script_dir, "..", "..", "plugins", "sound", "config.yaml")
+        
+        if os.path.exists(sound_config_path):
+            with open(sound_config_path, 'r', encoding='utf-8') as f:
+                if YAML_AVAILABLE:
+                    return yaml.safe_load(f)
+                else:
+                    return {}
+        return {}
+    except Exception:
+        return {}
 
 def save_config(config):
     """Save the configuration"""
     with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2, ensure_ascii=False)
+        if CONFIG_FILE.endswith('.yaml') and YAML_AVAILABLE:
+            yaml.safe_dump(config, f, default_flow_style=False, indent=2)
+        else:
+            json.dump(config, f, indent=2, ensure_ascii=False)
 
 def show_status(config):
     """Display current configuration status"""
@@ -51,15 +94,30 @@ def show_status(config):
     print("-" * 40)
     
     # Sound status
-    sound_enabled = config.get('notifications', {}).get('sound', {}).get('enabled', False)
+    sound_enabled = config.get('plugins', {}).get('sound', {}).get('enabled', False)
     print(f"Sound:          {'ENABLED' if sound_enabled else 'DISABLED'}")
     
+    # Voice set (if sound is enabled)
+    if sound_enabled:
+        sound_config = load_sound_config()
+        audio_dir = sound_config.get('audio_directory', 'voice')
+        voice_set_map = {
+            'voice': 'Default',
+            'female_tr': 'Female Turkish',
+            'male_tr': 'Male Turkish', 
+            'female_en': 'Female English',
+            'male_en': 'Male English',
+            'custom': 'Custom'
+        }
+        voice_set_name = voice_set_map.get(audio_dir, audio_dir)
+        print(f"Voice Set:      {voice_set_name} ({audio_dir})")
+    
     # Telegram status
-    telegram_enabled = config.get('notifications', {}).get('telegram', {}).get('enabled', False)
+    telegram_enabled = config.get('plugins', {}).get('telegram', {}).get('enabled', False)
     print(f"Telegram:       {'ENABLED' if telegram_enabled else 'DISABLED'}")
     
     # Toast status
-    toast_enabled = config.get('notifications', {}).get('desktop_toast', {}).get('enabled', False)
+    toast_enabled = config.get('plugins', {}).get('desktop_toast', {}).get('enabled', False)
     print(f"Desktop Toast:  {'ENABLED' if toast_enabled else 'DISABLED'}")
     
     # Language
@@ -88,19 +146,19 @@ def process_argument(arg, config):
     
     if key == 'sound':
         if value in ['0', '1']:
-            config.setdefault('notifications', {}).setdefault('sound', {})['enabled'] = (value == '1')
+            config.setdefault('plugins', {}).setdefault('sound', {})['enabled'] = (value == '1')
             print(f"Sound notifications {'enabled' if value == '1' else 'disabled'}")
             return True
             
     elif key == 'telegram':
         if value in ['0', '1']:
-            config.setdefault('notifications', {}).setdefault('telegram', {})['enabled'] = (value == '1')
+            config.setdefault('plugins', {}).setdefault('telegram', {})['enabled'] = (value == '1')
             print(f"Telegram notifications {'enabled' if value == '1' else 'disabled'}")
             return True
             
     elif key == 'toast':
         if value in ['0', '1']:
-            config.setdefault('notifications', {}).setdefault('desktop_toast', {})['enabled'] = (value == '1')
+            config.setdefault('plugins', {}).setdefault('desktop_toast', {})['enabled'] = (value == '1')
             print(f"Desktop toast notifications {'enabled' if value == '1' else 'disabled'}")
             return True
             
@@ -169,8 +227,8 @@ def main():
     """Main function"""
     args = sys.argv[1:]
     
-    # Show help if no arguments
-    if not args:
+    # Show help if no arguments or help requested
+    if not args or 'help' in args or '?' in args:
         show_help()
         return
     
@@ -185,7 +243,7 @@ def main():
     # Process all arguments
     changes_made = False
     for arg in args:
-        if arg == 'status':
+        if arg in ['status', 'help', '?']:
             continue  # Already handled above
         if process_argument(arg, config):
             changes_made = True

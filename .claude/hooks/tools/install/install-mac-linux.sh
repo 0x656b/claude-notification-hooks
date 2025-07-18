@@ -30,7 +30,10 @@ echo ""
 # Install dependencies
 echo "Installing Python packages..."
 python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements.txt
+
+# Get script directory and install from there
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+python3 -m pip install -r "$SCRIPT_DIR/requirements.txt"
 
 if [ $? -ne 0 ]; then
     echo ""

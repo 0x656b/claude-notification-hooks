@@ -2,6 +2,61 @@
 
 All notable changes to Claude Code Hook Notification System will be documented in this file.
 
+## [2.0.0] - 2025-01-18
+
+### Major Restructuring Release 🚀
+
+#### **Complete Architecture Overhaul**
+- **Unified notification system** - Merged activity-logger.py into notify-all.py
+  - Single script handles all events (PreToolUse, PostToolUse, Stop, etc.)
+  - Eliminated duplicate processes and improved performance
+  - Activity logging now integrated into main notification flow
+
+#### **New Modular Folder Structure**
+```
+.claude/hooks/
+├── core/               # Main notification dispatcher
+├── plugins/            # Self-contained notification plugins
+│   ├── sound/         # Audio notifications with voice switching
+│   ├── telegram/      # Telegram bot notifications
+│   └── desktop/       # Desktop toast notifications
+└── tools/             # Installation and configuration tools
+```
+
+#### **YAML Configuration System**
+- **Replaced JSON with YAML** for all configuration files
+- Much more readable and user-friendly syntax
+- Plugin-specific configs with per-plugin documentation
+- Backward compatibility with JSON fallback
+
+#### **Enhanced Sound System**
+- **Configurable voice directories** - Switch between voice sets with one line
+  - `audio_directory: "voice"` → `audio_directory: "female_tr"`
+  - Support for multiple voice sets: voice/, female_tr/, male_tr/, female_en/, male_en/, custom/
+- **Improved Mac beep fallback** - More reliable system beep using osascript
+- **Audio file gitignore** - No copyrighted content in repository
+
+#### **Ultra-Simple Documentation**
+- **Landing page READMEs** - Reduced from 80+ lines to 27 lines
+- **Instant setup promise** - True 30-second installation experience
+- **Detailed guides moved** - Full documentation in docs/FULL-GUIDE.md
+- **Bilingual support** - Both English and Turkish ultra-simple READMEs
+
+#### **Plugin Independence**
+- **Self-contained plugins** - Each plugin has its own config.yaml and README.md
+- **Per-plugin documentation** - Setup instructions specific to each notification type
+- **Easy plugin management** - Add/remove plugins without affecting others
+
+### Breaking Changes ⚠️
+- **Configuration file locations changed** - All configs now in plugin directories
+- **Settings.json simplified** - Removed duplicate activity-logger hooks
+- **File paths updated** - All scripts moved to new organized structure
+
+### Migration Notes
+- Old configurations will fallback gracefully
+- New installations get clean structure immediately
+- Existing users: hooks will auto-update paths after `/hooks` command
+
 ## [1.0.1] - 2025-01-17
 
 ### Added

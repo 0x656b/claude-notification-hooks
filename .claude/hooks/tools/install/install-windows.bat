@@ -21,7 +21,7 @@ echo Python paketleri yukleniyor...
 python -m pip install --upgrade pip
 
 REM Bagimliliklari yukle
-python -m pip install -r requirements.txt
+python -m pip install -r "%~dp0requirements.txt"
 
 if errorlevel 1 (
     echo.

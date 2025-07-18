@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Bash PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Bash PreToolUse"
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Edit PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Edit PreToolUse"
           }
         ]
       },
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py MultiEdit PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py MultiEdit PreToolUse"
           }
         ]
       },
@@ -33,7 +33,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Read PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Read PreToolUse"
           }
         ]
       },
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py LS PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py LS PreToolUse"
           }
         ]
       },
@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Glob PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Glob PreToolUse"
           }
         ]
       },
@@ -60,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Grep PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Grep PreToolUse"
           }
         ]
       },
@@ -69,7 +69,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Git PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Git PreToolUse"
           }
         ]
       },
@@ -78,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py PR PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py PR PreToolUse"
           }
         ]
       },
@@ -87,7 +87,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Test PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Test PreToolUse"
           }
         ]
       },
@@ -96,7 +96,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Write PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Write PreToolUse"
           }
         ]
       },
@@ -105,7 +105,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Task PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Task PreToolUse"
           }
         ]
       },
@@ -114,7 +114,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py TodoWrite PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py TodoWrite PreToolUse"
           }
         ]
       },
@@ -123,7 +123,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py WebSearch PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py WebSearch PreToolUse"
           }
         ]
       },
@@ -132,7 +132,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py WebFetch PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py WebFetch PreToolUse"
           }
         ]
       },
@@ -141,7 +141,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py NotebookRead PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py NotebookRead PreToolUse"
           }
         ]
       },
@@ -150,7 +150,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py NotebookEdit PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py NotebookEdit PreToolUse"
           }
         ]
       },
@@ -159,171 +159,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py exit_plan_mode PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py exit_plan_mode PreToolUse"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Bash"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Edit"
-          }
-        ]
-      },
-      {
-        "matcher": "MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py MultiEdit"
-          }
-        ]
-      },
-      {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Read"
-          }
-        ]
-      },
-      {
-        "matcher": "LS",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py LS"
-          }
-        ]
-      },
-      {
-        "matcher": "Glob",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Glob"
-          }
-        ]
-      },
-      {
-        "matcher": "Grep",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Grep"
-          }
-        ]
-      },
-      {
-        "matcher": "Git",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Git"
-          }
-        ]
-      },
-      {
-        "matcher": "PR",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py PR"
-          }
-        ]
-      },
-      {
-        "matcher": "Test",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Test"
-          }
-        ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Write"
-          }
-        ]
-      },
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py Task"
-          }
-        ]
-      },
-      {
-        "matcher": "TodoWrite",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py TodoWrite"
-          }
-        ]
-      },
-      {
-        "matcher": "WebSearch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py WebSearch"
-          }
-        ]
-      },
-      {
-        "matcher": "WebFetch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py WebFetch"
-          }
-        ]
-      },
-      {
-        "matcher": "NotebookRead",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py NotebookRead"
-          }
-        ]
-      },
-      {
-        "matcher": "NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py NotebookEdit"
-          }
-        ]
-      },
-      {
-        "matcher": "exit_plan_mode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 .claude/hooks/config-manager/activity-logger.py exit_plan_mode"
+            "command": "python3 ./.claude/hooks/core/notify-all.py * PostToolUse"
           }
         ]
       }
@@ -334,7 +181,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Stop Stop"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Stop Stop"
           }
         ]
       }
@@ -345,7 +192,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py SubagentStop SubagentStop"
+            "command": "python3 ./.claude/hooks/core/notify-all.py SubagentStop SubagentStop"
           }
         ]
       }
@@ -356,7 +203,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/config-manager/notify-all.py Notification Notification"
+            "command": "python3 ./.claude/hooks/core/notify-all.py Notification Notification"
           }
         ]
       }

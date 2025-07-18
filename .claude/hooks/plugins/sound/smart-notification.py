@@ -9,8 +9,19 @@ import datetime
 import json
 
 # Platform utils'i import et
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
-from platform_utils import get_platform, get_sound_player, get_beep_command
+try:
+    from platform_utils import get_platform, get_sound_player, get_beep_command
+except ImportError:
+    # Fallback implementations
+    def get_platform():
+        import platform
+        return platform.system().lower()
+    
+    def get_sound_player():
+        return None
+    
+    def get_beep_command():
+        return None
 
 # Platform-specific imports
 platform = get_platform()
@@ -27,10 +38,25 @@ def get_script_dir():
     return os.path.dirname(os.path.abspath(__file__))
 
 def load_sound_mapping():
-    """Ses mapping config'ini yükle"""
+    """Ses mapping config'ini yükle (YAML format)"""
     script_dir = get_script_dir()
+    
+    # Try YAML first
+    yaml_file = os.path.join(script_dir, "config.yaml")
+    try:
+        import yaml
+        with open(yaml_file, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+        return config
+    except ImportError:
+        print("PyYAML not installed, falling back to JSON config")
+    except (FileNotFoundError, Exception):
+        pass
+    
+    # Fallback to JSON
     mapping_file = os.path.join(script_dir, "sound-mapping.json")
     try:
+        import json
         with open(mapping_file, 'r', encoding='utf-8') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
@@ -45,12 +71,13 @@ def load_sound_mapping():
 def load_config():
     """Config dosyasını yükle"""
     script_dir = get_script_dir()
-    config_file = os.path.join(script_dir, "..", "config-manager", "notification-config.json")
+    # Try core config first
+    core_config = os.path.join(script_dir, "..", "..", "core", "config.yaml")
     try:
-        with open(config_file, 'r', encoding='utf-8') as f:
-            import json
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+        import yaml
+        with open(core_config, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except (ImportError, FileNotFoundError, Exception):
         return {"logging": {"enabled": True}}
 
 def check_log_size(log_file, max_size_mb):
@@ -73,7 +100,12 @@ def play_sound_for_tool(tool_name="default", event_type="PreToolUse"):
     """Tool'a göre uygun sesi çal"""
     
     script_dir = get_script_dir()
-    voice_dir = os.path.join(script_dir, "voice")
+    
+    # Load sound config to get audio directory
+    sound_config = load_sound_mapping()
+    audio_directory = sound_config.get("audio_directory", "voice")
+    voice_dir = os.path.join(script_dir, audio_directory)
+    
     log_file = os.path.join(script_dir, "..", "notifications.log")
     
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -88,7 +120,7 @@ def play_sound_for_tool(tool_name="default", event_type="PreToolUse"):
         sound_file = None
         
         # Önce event_sounds'a bak (Stop, Error gibi özel durumlar için)
-        if event_type in sound_mapping.get("event_sounds", {}):
+        if event_type in sound_mapping.get("event_sounds", {}) and sound_mapping["event_sounds"][event_type] is not None:
             sound_file = sound_mapping["event_sounds"][event_type]
         # Sonra tool_sounds'a bak
         elif tool_name in sound_mapping.get("tool_sounds", {}):

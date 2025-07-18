@@ -1,0 +1,21 @@
+# Audio files are not included in the repository
+# Users should add their own MP3 files to these directories
+
+# Ignore all MP3 files
+*.mp3
+
+# Ignore audio directories except the default voice/ folder structure
+voice/
+female_tr/
+male_tr/
+female_en/
+male_en/
+custom/
+
+# Keep the directory structure with placeholder files
+!voice/.gitkeep
+!female_tr/.gitkeep
+!male_tr/.gitkeep
+!female_en/.gitkeep
+!male_en/.gitkeep
+!custom/.gitkeep

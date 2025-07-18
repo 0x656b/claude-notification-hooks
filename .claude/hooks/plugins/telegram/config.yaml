@@ -1,0 +1,18 @@
+# Telegram Plugin Configuration
+
+# Plugin metadata
+name: "Telegram Notification Plugin"
+description: "Sends notifications via Telegram bot"
+version: "1.0.0"
+
+# Telegram bot settings (replace with your actual credentials)
+bot_token: "YOUR_BOT_TOKEN_HERE"
+chat_id: "YOUR_CHAT_ID_HERE"
+
+# Message settings
+message_format: "🤖 Claude Code: {message}"
+use_markdown: true
+
+# Error handling
+retry_attempts: 3
+timeout_seconds: 10

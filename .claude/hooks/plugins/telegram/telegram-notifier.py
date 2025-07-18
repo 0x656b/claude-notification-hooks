@@ -28,15 +28,32 @@ if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
 
 # Environment'ta yoksa, config dosyasından oku
 if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-    config_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "telegram-config.json"))
-    if os.path.exists(config_path):
-        try:
-            with open(config_path, 'r') as f:
-                config = json.load(f)
-                TELEGRAM_BOT_TOKEN = config.get("bot_token", "")
-                TELEGRAM_CHAT_ID = config.get("chat_id", "")
-        except (FileNotFoundError, json.JSONDecodeError, IOError):
-            pass  # Config file not found or invalid
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Try YAML first
+    yaml_config_path = os.path.join(script_dir, "config.yaml")
+    try:
+        import yaml
+        with open(yaml_config_path, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+            TELEGRAM_BOT_TOKEN = config.get("bot_token", "")
+            TELEGRAM_CHAT_ID = config.get("chat_id", "")
+    except ImportError:
+        pass  # PyYAML not installed
+    except (FileNotFoundError, Exception):
+        pass  # YAML config not found
+    
+    # Fallback to JSON
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        config_path = os.path.join(script_dir, "telegram-config.json")
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r') as f:
+                    config = json.load(f)
+                    TELEGRAM_BOT_TOKEN = config.get("bot_token", "")
+                    TELEGRAM_CHAT_ID = config.get("chat_id", "")
+            except (FileNotFoundError, json.JSONDecodeError, IOError):
+                pass  # Config file not found or invalid
 
 # Hala yoksa placeholder kullan
 if not TELEGRAM_BOT_TOKEN:
