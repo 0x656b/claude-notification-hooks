@@ -1,0 +1,46 @@
+# HookMonitor Plugin Configuration
+
+# Plugin metadata
+name: "HookMonitor Plugin"
+description: "Monitors and logs all Claude Code hook events for debugging and analysis"
+version: "3.0.0"
+
+# Monitor settings
+enabled: true
+log_file: "hook-monitor.log"
+max_file_size_mb: 50
+auto_rotate: true
+
+# Encoding options for experimentation
+encoding:
+  primary: "latin1"   # Most tolerant - never fails
+  fallback: "utf-8"   # UTF-8 with surrogate cleanup  
+  final_fallback: "cp1254"
+  errors: "ignore"    # ignore problematic chars completely
+
+# Output format
+output:
+  emoji_headers: true
+  timestamps: true
+  json_indent: 2
+  truncate_prompt: 100
+  show_full_json: true
+
+# Event filtering
+events:
+  UserPromptSubmit: true
+  PreToolUse: true
+  PostToolUse: true
+  Stop: true
+  SessionStart: true
+  Notification: true
+  SubagentStop: true
+  PreCompact: true
+
+# Content filtering
+content:
+  include_tool_input: true
+  include_tool_response: true
+  include_environment: true
+  include_session_info: true
+  hide_sensitive_data: false

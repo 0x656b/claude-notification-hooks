@@ -2,175 +2,22 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Bash PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Edit PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py MultiEdit PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Read PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "LS",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py LS PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Glob",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Glob PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Grep",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Grep PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Git",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Git PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "PR",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py PR PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Test",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Test PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Write PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Task PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "TodoWrite",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py TodoWrite PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "WebSearch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py WebSearch PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "WebFetch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py WebFetch PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "NotebookRead",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py NotebookRead PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py NotebookEdit PreToolUse"
-          }
-        ]
-      },
-      {
-        "matcher": "exit_plan_mode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py exit_plan_mode PreToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "*",
+        "matcher": "*", 
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py * PostToolUse"
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
           }
         ]
       }
@@ -181,18 +28,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Stop Stop"
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
           }
         ]
       }
     ],
-    "SubagentStop": [
+    "UserPromptSubmit": [
       {
         "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py SubagentStop SubagentStop"
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
           }
         ]
       }
@@ -203,7 +61,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./.claude/hooks/core/notify-all.py Notification Notification"
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./.claude/hooks/core/notify-all.py"
           }
         ]
       }

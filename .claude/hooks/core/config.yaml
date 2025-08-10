@@ -57,6 +57,18 @@ plugins:
       Stop: true
       SubagentStop: true
     script: ../plugins/telegram/telegram-notifier.py
+  hookMonitor:
+    enabled: true
+    events:
+      UserPromptSubmit: true
+      PreToolUse: true
+      PostToolUse: true
+      Stop: true
+      SessionStart: true
+      Notification: true
+      SubagentStop: true
+      PreCompact: true
+    script: ../plugins/hookMonitor/hookMonitor.py
 quiet_hours:
   enabled: true
   end: 07:00
