@@ -11,12 +11,12 @@ log_file: "hook-monitor.log"
 max_file_size_mb: 50
 auto_rotate: true
 
-# Encoding options for experimentation
+# Encoding options - UTF-8 first for proper Turkish support
 encoding:
-  primary: "latin1"   # Most tolerant - never fails
-  fallback: "utf-8"   # UTF-8 with surrogate cleanup  
+  primary: "utf-8"     # UTF-8 first for proper unicode
+  fallback: "latin1"   # Latin1 fallback - never fails
   final_fallback: "cp1254"
-  errors: "ignore"    # ignore problematic chars completely
+  errors: "replace"    # replace problematic chars with ?
 
 # Output format
 output:

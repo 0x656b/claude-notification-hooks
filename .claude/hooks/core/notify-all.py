@@ -9,33 +9,53 @@ import os
 import datetime
 import json
 
+# Global variable to store raw stdin bytes
+raw_stdin_bytes = None
+
 def load_hook_data():
-    """Hook'tan gelen JSON data'yı parse et"""
+    """Hook'tan gelen raw data'yı oku ve minimal parsing yap"""
     try:
-        # stdin'den raw bytes oku (encoding fix için)
-        raw_bytes = sys.stdin.buffer.read()
+        # Raw bytes'ları oku ve global değişkende sakla
+        global raw_stdin_bytes
+        raw_stdin_bytes = sys.stdin.buffer.read()
         
-        # CP1254 (Windows Turkish) encoding fix
-        try:
-            stdin_data = raw_bytes.decode('cp1254', errors='replace').strip()
-        except:
-            # Fallback: UTF-8 with surrogate cleanup
-            try:
-                stdin_data = raw_bytes.decode('utf-8', errors='replace').strip()
-            except:
-                stdin_data = raw_bytes.decode('latin1', errors='replace').strip()
-        
-        # JSON parse et
-        if stdin_data:
-            hook_data = json.loads(stdin_data)
-            return hook_data
-        else:
+        # Super minimal parsing: sadece routing için gerekli alanları bul
+        # Raw bytes'ları regex ile parse et - encoding bozulmadan
+        if not raw_stdin_bytes:
             return {"error": "No stdin data"}
+        
+        try:
+            # Raw bytes'ı ASCII olarak decode et (sadece ASCII karakterler için)
+            raw_text = raw_stdin_bytes.decode('ascii', errors='ignore')
             
-    except json.JSONDecodeError as e:
-        return {"error": f"JSON parse failed: {e}"}
+            # Regex ile hook_event_name ve tool_name bul
+            import re
+            
+            event_match = re.search(r'"hook_event_name":\s*"([^"]*)"', raw_text)
+            tool_match = re.search(r'"tool_name":\s*"([^"]*)"', raw_text)
+            
+            event_type = event_match.group(1) if event_match else "Unknown"
+            tool_name = tool_match.group(1) if tool_match else "Unknown"
+            
+            return {
+                "hook_event_name": event_type,
+                "tool_name": tool_name,
+                "raw_available": True
+            }
+        except Exception:
+            # Fallback: sys.argv'dan al
+            tool_name = sys.argv[1] if len(sys.argv) > 1 else "Unknown"
+            event_type = sys.argv[2] if len(sys.argv) > 2 else "Unknown"
+            
+            return {
+                "hook_event_name": event_type,
+                "tool_name": tool_name,
+                "raw_available": True,
+                "error": "Regex parse failed, using sys.argv"
+            }
+            
     except Exception as e:
-        return {"error": f"Hook data load failed: {e}"}
+        return {"error": f"Hook data load failed: {e}", "raw_available": False}
 
 def load_config():
     """Core config'ini yükle (YAML format)"""
@@ -156,18 +176,14 @@ def run_plugin(plugin_config, hook_data, config):
         return
         
     try:
-        # Hook data'yı JSON olarak plugin'e gönder
-        json_input = json.dumps(hook_data, ensure_ascii=False)
-        
         # Event type ve tool name'i argument olarak ver (backward compatibility)
         event_type = hook_data.get("hook_event_name", "Unknown")
         tool_name = hook_data.get("tool_name", event_type)
         
-        # Plugin'i çalıştır
+        # Raw bytes'ları stdin'e gönder (encoding problemi olmadan)
         process = subprocess.run(
             ["python3", full_script_path, tool_name, event_type],
-            input=json_input,
-            text=True,
+            input=raw_stdin_bytes,
             capture_output=True,
             timeout=10,
             cwd=script_dir
