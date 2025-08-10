@@ -105,6 +105,52 @@ def should_monitor_event(hook_data, config):
     events_config = config.get("events", {})
     return events_config.get(event_type, False)
 
+def parse_transcript(transcript_path):
+    """JSONL transcript dosyasını parse et ve Claude'un son mesajını bul"""
+    try:
+        if not transcript_path or not os.path.exists(transcript_path):
+            return None
+            
+        last_assistant_message = None
+        message_count = 0
+        
+        with open(transcript_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                    
+                try:
+                    entry = json.loads(line)
+                    message_count += 1
+                    
+                    # Claude Code transcript formatına göre parse et
+                    if entry.get('type') == 'assistant' and 'message' in entry:
+                        message = entry['message']
+                        
+                        # Son assistant mesajını bul (message.content)
+                        if 'content' in message:
+                            content = message['content']
+                            if isinstance(content, list):
+                                # Tool use içinde text var mı?
+                                text_parts = [part.get('text', '') for part in content if part.get('type') == 'text']
+                                if text_parts:
+                                    last_assistant_message = ''.join(text_parts)
+                            elif isinstance(content, str):
+                                last_assistant_message = content
+                            
+                except json.JSONDecodeError:
+                    continue
+                    
+        return {
+            'last_message': last_assistant_message,
+            'message_count': message_count,
+            'preview': last_assistant_message[:200] + "..." if last_assistant_message and len(last_assistant_message) > 200 else last_assistant_message
+        }
+        
+    except Exception as e:
+        return {'error': f'Transcript parse error: {e}'}
+
 def format_log_entry(hook_data, config):
     """Log entry'sini formatla"""
     output_config = config.get("output", {})
@@ -156,6 +202,22 @@ def format_log_entry(hook_data, config):
     # CWD
     if hook_data.get("cwd"):
         entry += f"📂 CWD: {hook_data['cwd']}\n" if output_config.get("emoji_headers", True) else f"CWD: {hook_data['cwd']}\n"
+    
+    # Transcript parsing (Stop event'inde Claude'un son mesajını göster)
+    if event_type == "Stop" and hook_data.get("transcript_path"):
+        transcript_data = parse_transcript(hook_data["transcript_path"])
+        if transcript_data:
+            if 'error' in transcript_data:
+                entry += f"❌ TRANSCRIPT ERROR: {transcript_data['error']}\n" if output_config.get("emoji_headers", True) else f"TRANSCRIPT ERROR: {transcript_data['error']}\n"
+            else:
+                # Mesaj sayısı
+                entry += f"📊 STATS: {transcript_data['message_count']} messages in session\n" if output_config.get("emoji_headers", True) else f"STATS: {transcript_data['message_count']} messages in session\n"
+                
+                # Claude'un son mesajı preview (Stop event'inde tam mesajı göster)
+                if transcript_data['last_message']:
+                    # Stop event'inde tam mesajı göster, diğerlerinde preview
+                    message_to_show = transcript_data['last_message'][:500] + "..." if len(transcript_data['last_message']) > 500 else transcript_data['last_message']
+                    entry += f"🤖 CLAUDE RESPONSE: {message_to_show}\n" if output_config.get("emoji_headers", True) else f"CLAUDE RESPONSE: {message_to_show}\n"
     
     # Full JSON
     if output_config.get("show_full_json", True):
