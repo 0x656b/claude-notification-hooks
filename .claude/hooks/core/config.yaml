@@ -1,7 +1,7 @@
 culture:
   language: en
 logging:
-  enabled: false
+  enabled: true
   max_size_mb: 10
   rotate: true
 plugins:

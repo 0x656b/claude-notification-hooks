@@ -136,7 +136,7 @@ def load_config():
     except (FileNotFoundError, json.JSONDecodeError):
         return {"culture": {"language": "en"}}
 
-def create_message(tool_name="default", event_type="PreToolUse"):
+def create_message(tool_name="default", event_type="PreToolUse", project_path=None, transcript_path=None):
     """Tool'a göre mesaj oluştur"""
     
     timestamp = datetime.datetime.now().strftime("%H:%M:%S")
@@ -157,20 +157,83 @@ def create_message(tool_name="default", event_type="PreToolUse"):
     
     msgs = MESSAGES[lang]
     
-    # Proje klasörünü al
-    project_folder = os.path.basename(os.getcwd())
-    project_path = os.getcwd()
+    # Proje klasörünü al - önce parametre, sonra fallback
+    if not project_path:
+        project_path = os.getcwd()
+    project_folder = os.path.basename(project_path)
     
     if event_type == "Stop":
         message = f"{emoji} <b>{msgs['work_completed']}</b>\n"
         message += f"📁 <code>{project_folder}</code>\n"
         message += f"📍 <code>{project_path}</code>\n"
         message += f"🕐 {timestamp}\n"
+        
+        # Transcript'ten Claude'un son mesajını al
+        claude_response = None
+        if transcript_path and os.path.exists(transcript_path):
+            try:
+                with open(transcript_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    for line in f:
+                        try:
+                            entry = json.loads(line.strip())
+                            if entry.get('type') == 'assistant' and 'message' in entry:
+                                message_obj = entry['message']
+                                if 'content' in message_obj:
+                                    content = message_obj['content']
+                                    if isinstance(content, list):
+                                        for item in content:
+                                            if isinstance(item, dict) and item.get('type') == 'text':
+                                                claude_response = item.get('text', '')
+                                                break
+                                    elif isinstance(content, str):
+                                        claude_response = content
+                        except (json.JSONDecodeError, KeyError):
+                            continue
+            except (IOError, Exception):
+                pass
+        
+        if claude_response:
+            # Son 500 karakteri al
+            if len(claude_response) > 500:
+                claude_response = "..." + claude_response[-497:]
+            message += f"\n💭 <i>{claude_response}</i>\n"
+        
         message += f"💬 {msgs['claude_finished']}"
     elif event_type == "Notification":
         message = f"{emoji} <b>{msgs['attention_needed']}</b>\n"
         message += f"📁 <code>{project_folder}</code>\n"
         message += f"🕐 {timestamp}\n"
+        
+        # Transcript'ten Claude'un son mesajını al
+        claude_response = None
+        if transcript_path and os.path.exists(transcript_path):
+            try:
+                with open(transcript_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    for line in f:
+                        try:
+                            entry = json.loads(line.strip())
+                            if entry.get('type') == 'assistant' and 'message' in entry:
+                                message_obj = entry['message']
+                                if 'content' in message_obj:
+                                    content = message_obj['content']
+                                    if isinstance(content, list):
+                                        for item in content:
+                                            if isinstance(item, dict) and item.get('type') == 'text':
+                                                claude_response = item.get('text', '')
+                                                break
+                                    elif isinstance(content, str):
+                                        claude_response = content
+                        except (json.JSONDecodeError, KeyError):
+                            continue
+            except (IOError, Exception):
+                pass
+        
+        if claude_response:
+            # Son 500 karakteri al
+            if len(claude_response) > 500:
+                claude_response = "..." + claude_response[-497:]
+            message += f"\n💭 <i>{claude_response}</i>\n"
+        
         message += f"❓ {msgs['claude_asking']}"
     elif event_type == "SubagentStop":
         message = f"{emoji} <b>{msgs['subtask_completed']}</b>\n"
@@ -200,13 +263,37 @@ async def main():
     tool_name = sys.argv[1] if len(sys.argv) > 1 else "default"
     event_type = sys.argv[2] if len(sys.argv) > 2 else "PreToolUse"
     
+    # JSON input'u oku
+    project_path = None
+    transcript_path = None
+    try:
+        stdin_data = sys.stdin.read()
+        if stdin_data.strip():
+            hook_data = json.loads(stdin_data)
+            project_path = hook_data.get("working_directory") or hook_data.get("cwd")
+            transcript_path = hook_data.get("transcript_path")
+    except (json.JSONDecodeError, Exception):
+        pass  # JSON parse hatası, fallback kullan
+    
     # Token kontrolü
     if TELEGRAM_BOT_TOKEN == "YOUR_BOT_TOKEN_HERE":
         print("⚠️ Telegram bot token'ı ayarlanmamış!")
         return
     
     # Mesajı oluştur ve gönder
-    message = create_message(tool_name, event_type)
+    message = create_message(tool_name, event_type, project_path, transcript_path)
+    
+    # False positive notification'ları filtrele
+    # "Claude is waiting for your input" = timeout, "Claude needs your permission" = gerçek
+    if event_type == "Notification" and tool_name == "Unknown":
+        try:
+            hook_data = json.loads(stdin_data) if 'stdin_data' in locals() and stdin_data else {}
+            message_content = hook_data.get("message", "")
+            if "waiting for your input" in message_content:
+                print("False positive notification filtrelendi (timeout)")
+                return
+        except:
+            pass
     
     # Sadece önemli event'lerde bildirim gönder (opsiyonel)
     important_events = ["Stop", "Notification", "SubagentStop"]

@@ -104,7 +104,7 @@ def load_config():
     except (FileNotFoundError, json.JSONDecodeError):
         return {"culture": {"language": "en"}}
 
-def create_notification(tool_name="default", event_type="PreToolUse"):
+def create_notification(tool_name="default", event_type="PreToolUse", project_path=None):
     """Tool'a göre bildirim oluştur"""
     
     timestamp = datetime.datetime.now().strftime("%H:%M:%S")
@@ -125,8 +125,10 @@ def create_notification(tool_name="default", event_type="PreToolUse"):
     
     msgs = MESSAGES[lang]
     
-    # Proje klasörünü al
-    project_folder = os.path.basename(os.getcwd())
+    # Proje klasörünü al - önce parametre, sonra fallback
+    if not project_path:
+        project_path = os.getcwd()
+    project_folder = os.path.basename(project_path)
     
     if event_type == "Stop":
         title = f"{emoji} {msgs['work_completed']}"
@@ -199,8 +201,18 @@ def main():
     tool_name = sys.argv[1] if len(sys.argv) > 1 else "default"
     event_type = sys.argv[2] if len(sys.argv) > 2 else "PreToolUse"
     
+    # JSON input'u oku
+    project_path = None
+    try:
+        stdin_data = sys.stdin.read()
+        if stdin_data.strip():
+            hook_data = json.loads(stdin_data)
+            project_path = hook_data.get("working_directory") or hook_data.get("cwd")
+    except (json.JSONDecodeError, Exception):
+        pass  # JSON parse hatası, fallback kullan
+    
     # Bildirim oluştur
-    title, message = create_notification(tool_name, event_type)
+    title, message = create_notification(tool_name, event_type, project_path)
     
     # Sadece önemli event'lerde bildirim göster
     important_events = ["Stop", "Notification", "SubagentStop"]
